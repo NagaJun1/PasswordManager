@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.example.passwordmanager.constant.Constant;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
@@ -31,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         // 「パスワード生成」ボタン押下処理を設定
         this.setAddPasswordClickEvent();
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        System.out.println("...MainActivity.onStart()");
 
         // パスワードリスト押下時の処理を設定
         this.setPasswordList();
@@ -40,21 +48,34 @@ public class MainActivity extends AppCompatActivity {
      * パスワードリスト押下時の処理を設定
      */
     private void setPasswordList() {
-        ListView listView = this.getPasswordList();
+        // ファイル名一覧を取得
+        String[] fileList = this.getFilesDir().list();
 
+        // password_list を取得、リスト内アイテムの登録
+        ListView listView = this.getPasswordList(fileList);
+
+        // リスト内アイテム押下時の処理
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String password = "...load password";
+                // 押下されたアイテムのインデックスからフィル名を取得
+                String passwordKeyWord = fileList[i];
 
-                MainActivity.this.showSubActivity(password);
+                // パスワード表示画面に遷移
+                MainActivity.this.showSubActivity(passwordKeyWord);
             }
         });
     }
 
-    private ListView getPasswordList() {
+    /**
+     * ListView の取得、リスト内アイテムの登録
+     * @param fileList パスワードを保存しているファイル名一覧
+     * @return password_list
+     */
+    @NonNull
+    private ListView getPasswordList(String[] fileList) {
         ListAdapter listAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, this.getFilesDir().list());
+                this, android.R.layout.simple_list_item_1, fileList);
 
         ListView listView = this.findViewById(R.id.password_list);
         listView.setAdapter(listAdapter);
@@ -71,37 +92,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // パスワード生成
-                String password = createNewPassword();
+                String passwordKeyWord = Constant._String.EMPTY;
 
                 // パスワード表示画面に遷移
-                MainActivity.this.showSubActivity(password);
+                MainActivity.this.showSubActivity(passwordKeyWord);
             }
         });
     }
 
     /**
-     * SecondFragment 画面を表示
-     *
-     * @param passwordText 画面に表示するパスワード
+     * SubActivity 画面を表示
+     * @param passwordKeyWord 画面に表示するパスワード
      */
-    private void showSubActivity(String passwordText) {
+    private void showSubActivity(String passwordKeyWord) {
 
         // パスワード表示画面へ遷移
         Intent intent = new Intent(this.getApplication(), SubActivity.class);
 
         // パスワードを SubActivity に引き渡す
-        intent.putExtra(Constant.PASSWORD_TEXT, passwordText);
+        intent.putExtra(Constant.PASSWORD_KEY_WORD, passwordKeyWord);
 
         this.startActivity(intent);
-    }
-
-    /**
-     * パスワード生成
-     * @return
-     */
-    private static String createNewPassword() {
-        UUID uuid = UUID.randomUUID();
-        String[] idList = uuid.toString().split("-");
-        return idList[idList.length - 1];
     }
 }
