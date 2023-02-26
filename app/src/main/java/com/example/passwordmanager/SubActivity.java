@@ -10,11 +10,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.passwordmanager.component.ActivityBase;
+import com.example.passwordmanager.component.ConfirmDeleteDialog;
 import com.example.passwordmanager.component.KeywordInputDialogBuilder;
 import com.example.passwordmanager.constant.Constant;
 
@@ -26,7 +26,7 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.util.UUID;
 
-public class SubActivity extends AppCompatActivity {
+public class SubActivity extends ActivityBase {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -44,6 +44,22 @@ public class SubActivity extends AppCompatActivity {
 
         // 「コピー」ボタン押下時イベントを設定
         this.setCopyButtonClickEvent();
+
+        // 「＜」押下時の処理を設定
+        this.setBackButtonClickEvent();
+    }
+
+    /**
+     * 「＜」押下時の処理を設定
+     */
+    private void setBackButtonClickEvent() {
+        Button button = this.findViewById(R.id.button_close);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SubActivity.this.finish();
+            }
+        });
     }
 
     @Override
@@ -83,7 +99,7 @@ public class SubActivity extends AppCompatActivity {
             password = this.loadPassword(passwordKeyWord);
 
             // キーワードを画面に入力
-            keywordText.setText(passwordKeyWord.replace(".txt", Constant._String.EMPTY));
+            keywordText.setText(passwordKeyWord.replace(Constant._String.TXT_EXTENSION, Constant._String.EMPTY));
         }
 
         // パスワードを画面中心に表示
@@ -110,10 +126,10 @@ public class SubActivity extends AppCompatActivity {
                 return password;
             } catch (Exception ex) {
                 System.out.println(ex.toString());
-                Toast.makeText(this, "パスワードのロードに失敗しました", Toast.LENGTH_SHORT).show();
+                this.ToastShow("パスワードのロードに失敗しました");
             }
         } else {
-            Toast.makeText(this, "パスワードを記録したファイルが存在しません", Toast.LENGTH_SHORT).show();
+            this.ToastShow("パスワードを記録したファイルが存在しません");
         }
         this.finish();
         return Constant._String.EMPTY;
@@ -121,8 +137,9 @@ public class SubActivity extends AppCompatActivity {
 
     /**
      * パスワードのキーワードを新規に設定するためのダイアログを表示
+     *
      * @param keywordText パスワードに紐づけるキーワードの入力項目
-     * @param password パスワード
+     * @param password    パスワード
      */
     private void setNewPasswordKeyword(TextView keywordText, String password) {
 
@@ -131,11 +148,12 @@ public class SubActivity extends AppCompatActivity {
 
         // 「OK」ボタン押下時の処理を実装
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 // 入力値が空の場合はパスワード表示画面を閉じる
                 if (TextUtils.isEmpty(builder.getEditText())) {
-                    Toast.makeText(SubActivity.this, "空で設定はできません", Toast.LENGTH_SHORT).show();
+                    SubActivity.this.ToastShow("空で設定はできません");
                     SubActivity.this.finish();
                 } else {
                     // 入力されたテキストで画面上のキーワードを設定
@@ -155,16 +173,22 @@ public class SubActivity extends AppCompatActivity {
      * @param keyword  パスワードに紐づけるキーワード
      * @param password パスワード
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNewFile(String keyword, String password) {
         // ファイルを新規作成
-        File file = new File(this.getFilesDir(), keyword + ".txt");
+        File file = new File(this.getFilesDir(), keyword + Constant._String.TXT_EXTENSION);
 
-        try (FileWriter writer = new FileWriter(file, false)) {
-            BufferedWriter bufferedWriter = new BufferedWriter(writer);
-            bufferedWriter.append(password);
-            bufferedWriter.close();
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
+        if (Files.exists(file.toPath())) {
+            this.ToastShow("重複するデータが存在するため、新規作成ができません");
+            this.finish();
+        } else {
+            try (FileWriter writer = new FileWriter(file, false)) {
+                BufferedWriter bufferedWriter = new BufferedWriter(writer);
+                bufferedWriter.append(password);
+                bufferedWriter.close();
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
         }
     }
 
@@ -188,18 +212,13 @@ public class SubActivity extends AppCompatActivity {
         buttonCopy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Context thisContext = view.getContext();
-
                 // パスワードを取得
                 TextView passwordText = SubActivity.this.findViewById(R.id.password_text);
                 String password = passwordText.getText().toString();
 
                 // クリップボードに貼り付け
-                ClipData data = ClipData.newPlainText("password", password);
-                ClipboardManager clipboard = (ClipboardManager) thisContext.getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setPrimaryClip(data);
-
-                Toast.makeText(thisContext, "パスワードをコピーしました", Toast.LENGTH_SHORT).show();
+                SubActivity.this.setClipboard("password", password);
+                SubActivity.this.ToastShow("パスワードをコピーしました");
             }
         });
     }
@@ -212,11 +231,12 @@ public class SubActivity extends AppCompatActivity {
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                TextView textView = SubActivity.this.findViewById(R.id.keyword_text);
+                String targetKeyword = textView.getText().toString();
 
-                Toast.makeText(view.getContext(), "削除処理未実装", Toast.LENGTH_SHORT).show();
-
-                // 前画面に戻る
-                SubActivity.this.finish();
+                // ファイルの削除確認用ダイアログ
+                ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(SubActivity.this, targetKeyword);
+                dialog.create().show();
             }
         });
     }

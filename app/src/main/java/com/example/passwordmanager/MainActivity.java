@@ -3,6 +3,7 @@ package com.example.passwordmanager;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.passwordmanager.component.ActivityBase;
 import com.example.passwordmanager.constant.Constant;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -21,7 +22,7 @@ import android.widget.ListView;
 
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ActivityBase {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
