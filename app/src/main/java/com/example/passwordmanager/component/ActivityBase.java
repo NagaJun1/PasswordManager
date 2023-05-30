@@ -7,10 +7,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.passwordmanager.Util;
+
 public class ActivityBase extends AppCompatActivity {
 
     /**
      * Toast.makeText().show()
+     *
      * @param text 通知するテキスト
      */
     public void ToastShow(String text) {
@@ -20,12 +23,12 @@ public class ActivityBase extends AppCompatActivity {
 
     /**
      * クリップボードテキストを貼り付け
+     *
      * @param label ラベル
-     * @param text テキスト
+     * @param text  テキスト
      */
-    public void setClipboard(CharSequence label, CharSequence text) {
-        ClipData clipData = ClipData.newPlainText(label, text);
+    protected void setClipboard(CharSequence label, CharSequence text) {
         ClipboardManager clipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.setPrimaryClip(clipData);
+        Util.setClipboard(clipboard, label, text);
     }
 }

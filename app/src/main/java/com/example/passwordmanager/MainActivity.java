@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.example.passwordmanager.component.ActivityBase;
 import com.example.passwordmanager.constant.Constant;
+import com.example.passwordmanager.events.CreateBackupEvent;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
@@ -33,10 +34,13 @@ public class MainActivity extends ActivityBase {
 
         // 「パスワード生成」ボタン押下処理を設定
         this.setAddPasswordClickEvent();
+
+        // "button_create_back_up" のイベント追加（パスワードのバックアップファイル生成）
+        this.setCreateBackupClickEvent();
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
 
         System.out.println("...MainActivity.onStart()");
@@ -70,6 +74,7 @@ public class MainActivity extends ActivityBase {
 
     /**
      * ListView の取得、リスト内アイテムの登録
+     *
      * @param fileList パスワードを保存しているファイル名一覧
      * @return password_list
      */
@@ -81,6 +86,16 @@ public class MainActivity extends ActivityBase {
         ListView listView = this.findViewById(R.id.password_list);
         listView.setAdapter(listAdapter);
         return listView;
+    }
+
+    /**
+     * ボタン押下で、パスワード情報のバックアップ処理（ローカルファイルをコピー）
+     */
+    private void setCreateBackupClickEvent() {
+        Button btn = this.findViewById(R.id.button_create_back_up);
+
+        // パスワードファイルをコピー
+        btn.setOnClickListener(new CreateBackupEvent());
     }
 
     /**
@@ -103,6 +118,7 @@ public class MainActivity extends ActivityBase {
 
     /**
      * SubActivity 画面を表示
+     *
      * @param passwordKeyWord 画面に表示するパスワード
      */
     private void showSubActivity(String passwordKeyWord) {
