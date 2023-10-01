@@ -3,7 +3,6 @@ package com.example.passwordmanager.events;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Build;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,7 +13,6 @@ import com.example.passwordmanager.Util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.nio.file.Files;
 
 /**
  * ボタン押下で、パスワード情報のバックアップ処理（ローカルファイルをコピー）

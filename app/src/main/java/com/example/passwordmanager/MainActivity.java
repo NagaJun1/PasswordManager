@@ -2,26 +2,18 @@ package com.example.passwordmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.example.passwordmanager.component.ActivityBase;
-import com.example.passwordmanager.constant.Constant;
-import com.example.passwordmanager.events.CreateBackupEvent;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
-
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.util.UUID;
+import androidx.annotation.NonNull;
+
+import com.example.passwordmanager.component.ActivityBase;
+import com.example.passwordmanager.constant.Constant;
+import com.example.passwordmanager.events.CreateBackupEvent;
 
 public class MainActivity extends ActivityBase {
 

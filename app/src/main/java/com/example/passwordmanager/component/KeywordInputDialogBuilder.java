@@ -1,6 +1,5 @@
 package com.example.passwordmanager.component;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.widget.EditText;

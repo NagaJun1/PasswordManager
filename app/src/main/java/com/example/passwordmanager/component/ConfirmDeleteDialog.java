@@ -1,6 +1,5 @@
 package com.example.passwordmanager.component;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.widget.Toast;
